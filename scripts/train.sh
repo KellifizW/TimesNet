@@ -1,0 +1,2 @@
+#!/bin/bash
+python train.py --model TimesNet --data custom --root_path ./data/raw --data_path aapl_daily.csv --features S --seq_len 30 --pred_len 5 --d_model 64 --e_layers 2 --top_k 3 --batch_size 32 --learning_rate 0.001 --train_epochs 10 --patience 3 --checkpoints checkpoints
