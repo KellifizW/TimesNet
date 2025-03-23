@@ -4,18 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="292b40a3-630d-40ab-9746-7415e32f3255" name="Changes" comment="1">
-      <change afterPath="$PROJECT_DIR$/backtest.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/checkpoints/long_term_forecast_stock_forecast_TimesNet_sl15_pl5_dm90_df90_el2_dropout0.1_test_best_model.pth" beforeDir="false" afterPath="$PROJECT_DIR$/checkpoints/long_term_forecast_stock_forecast_TimesNet_sl15_pl5_dm90_df90_el2_dropout0.1_test_best_model.pth" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data_provider/data_loader.py" beforeDir="false" afterPath="$PROJECT_DIR$/data_provider/data_loader.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/exp/exp_stock_forecast.py" beforeDir="false" afterPath="$PROJECT_DIR$/exp/exp_stock_forecast.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/results/long_term_forecast_stock_forecast_TimesNet_sl15_pl5_dm90_df90_el2_dropout0.1_test_losses.csv" beforeDir="false" afterPath="$PROJECT_DIR$/results/long_term_forecast_stock_forecast_TimesNet_sl15_pl5_dm90_df90_el2_dropout0.1_test_losses.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/results/long_term_forecast_stock_forecast_TimesNet_sl15_pl5_dm90_df90_el2_dropout0.1_test_test_result.txt" beforeDir="false" afterPath="$PROJECT_DIR$/results/long_term_forecast_stock_forecast_TimesNet_sl15_pl5_dm90_df90_el2_dropout0.1_test_test_result.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/run.py" beforeDir="false" afterPath="$PROJECT_DIR$/run.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/testGPU1.py" beforeDir="false" afterPath="$PROJECT_DIR$/testGPU1.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/visualize.py" beforeDir="false" afterPath="$PROJECT_DIR$/visualize.py" afterDir="false" />
-    </list>
+    <list default="true" id="292b40a3-630d-40ab-9746-7415e32f3255" name="Changes" comment="1" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -182,7 +171,15 @@
       <option name="project" value="LOCAL" />
       <updated>1742725603445</updated>
     </task>
-    <option name="localTasksCounter" value="7" />
+    <task id="LOCAL-00007" summary="1">
+      <option name="closed" value="true" />
+      <created>1742734578123</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1742734578123</updated>
+    </task>
+    <option name="localTasksCounter" value="8" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
