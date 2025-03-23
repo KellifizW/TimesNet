@@ -5,8 +5,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="292b40a3-630d-40ab-9746-7415e32f3255" name="Changes" comment="323">
+      <change afterPath="$PROJECT_DIR$/data_utils.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/checkpoints/long_term_forecast_stock_forecast_TimesNet_sl15_pl5_dm90_df90_el2_dropout0.1_test_best_model.pth" beforeDir="false" afterPath="$PROJECT_DIR$/checkpoints/long_term_forecast_stock_forecast_TimesNet_sl15_pl5_dm90_df90_el2_dropout0.1_test_best_model.pth" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/raw/aapl_daily.csv" beforeDir="false" afterPath="$PROJECT_DIR$/data/raw/aapl_daily.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/exp/exp_stock_forecast.py" beforeDir="false" afterPath="$PROJECT_DIR$/exp/exp_stock_forecast.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/results/long_term_forecast_stock_forecast_TimesNet_sl15_pl5_dm90_df90_el2_dropout0.1_test_backtest_result.txt" beforeDir="false" afterPath="$PROJECT_DIR$/results/long_term_forecast_stock_forecast_TimesNet_sl15_pl5_dm90_df90_el2_dropout0.1_test_backtest_result.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/results/long_term_forecast_stock_forecast_TimesNet_sl15_pl5_dm90_df90_el2_dropout0.1_test_comparison_plot.html" beforeDir="false" afterPath="$PROJECT_DIR$/results/long_term_forecast_stock_forecast_TimesNet_sl15_pl5_dm90_df90_el2_dropout0.1_test_comparison_plot.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/results/long_term_forecast_stock_forecast_TimesNet_sl15_pl5_dm90_df90_el2_dropout0.1_test_future_forecast.txt" beforeDir="false" afterPath="$PROJECT_DIR$/results/long_term_forecast_stock_forecast_TimesNet_sl15_pl5_dm90_df90_el2_dropout0.1_test_future_forecast.txt" afterDir="false" />
@@ -14,7 +17,9 @@
       <change beforePath="$PROJECT_DIR$/results/long_term_forecast_stock_forecast_TimesNet_sl15_pl5_dm90_df90_el2_dropout0.1_test_losses.csv" beforeDir="false" afterPath="$PROJECT_DIR$/results/long_term_forecast_stock_forecast_TimesNet_sl15_pl5_dm90_df90_el2_dropout0.1_test_losses.csv" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/results/long_term_forecast_stock_forecast_TimesNet_sl15_pl5_dm90_df90_el2_dropout0.1_test_preds.npy" beforeDir="false" afterPath="$PROJECT_DIR$/results/long_term_forecast_stock_forecast_TimesNet_sl15_pl5_dm90_df90_el2_dropout0.1_test_preds.npy" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/results/long_term_forecast_stock_forecast_TimesNet_sl15_pl5_dm90_df90_el2_dropout0.1_test_test_result.txt" beforeDir="false" afterPath="$PROJECT_DIR$/results/long_term_forecast_stock_forecast_TimesNet_sl15_pl5_dm90_df90_el2_dropout0.1_test_test_result.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/run.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/run.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/run.py" beforeDir="false" afterPath="$PROJECT_DIR$/run.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/testGPU1.py" beforeDir="false" afterPath="$PROJECT_DIR$/testGPU1.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/visualize.py" beforeDir="false" afterPath="$PROJECT_DIR$/visualize.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -73,7 +78,7 @@
     &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
 }</component>
-  <component name="RunManager" selected="Python.convert">
+  <component name="RunManager" selected="Python.testGPU1 (1)">
     <configuration name="convert" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="TimesNet" />
       <option name="ENV_FILES" value="" />
@@ -145,8 +150,8 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Python.convert" />
         <item itemvalue="Python.testGPU1 (1)" />
+        <item itemvalue="Python.convert" />
         <item itemvalue="Python.testGPU1" />
       </list>
     </recent_temporary>
@@ -169,7 +174,7 @@
       <updated>1742660877600</updated>
       <workItem from="1742737562853" duration="2912000" />
       <workItem from="1742740962021" duration="18000" />
-      <workItem from="1742740988052" duration="976000" />
+      <workItem from="1742740988052" duration="7566000" />
     </task>
     <task id="LOCAL-00001" summary="1">
       <option name="closed" value="true" />
@@ -251,7 +256,15 @@
       <option name="project" value="LOCAL" />
       <updated>1742738872542</updated>
     </task>
-    <option name="localTasksCounter" value="11" />
+    <task id="LOCAL-00011" summary="323">
+      <option name="closed" value="true" />
+      <created>1742743036275</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1742743036276</updated>
+    </task>
+    <option name="localTasksCounter" value="12" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -274,6 +287,8 @@
     <option name="LAST_COMMIT_MESSAGE" value="323" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
+    <SUITE FILE_PATH="coverage/run_ipynb$convert.coverage" NAME="convert Coverage Results" MODIFIED="1742742998142" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/run_ipynb$testGPU1__1_.coverage" NAME="testGPU1 (1) Coverage Results" MODIFIED="1742747169892" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/TimesNet$convert.coverage" NAME="convert Coverage Results" MODIFIED="1742738501416" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
 </project>

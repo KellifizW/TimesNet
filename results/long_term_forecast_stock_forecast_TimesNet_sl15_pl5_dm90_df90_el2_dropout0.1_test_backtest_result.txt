@@ -1,15 +1,13 @@
-Backtest MSE: 158.5168
-Backtest MAE: 10.2603
-Backtest MAPE: 4.78%
-Direction Accuracy: 55.88%
-Final Value: $9702.85
-ROI: -2.97%
+Backtest MSE: 192.3198
+Backtest MAE: 11.5779
+Backtest MAPE: 5.39%
+Direction Accuracy: 52.94%
+Final Value: $9920.80
+ROI: -0.79%
 
 Trades:
 2025-03-08: Buy at 220.84, Position: 45.28
-2025-03-14: Sell at 214.00, Capital: 9690.27
-2025-03-15: Buy at 212.69, Position: 45.56
-2025-03-17: Sell at 214.10, Capital: 9754.51
-2025-03-16: Buy at 215.24, Position: 45.32
-2025-03-17: Sell at 214.10, Capital: 9702.85
-2025-03-18: Buy at 218.27, Position: 44.45
+2025-03-13: Sell at 213.49, Capital: 9667.18
+2025-03-14: Buy at 214.00, Position: 45.17
+2025-03-14: Sell at 214.00, Capital: 9667.18
+2025-03-15: Buy at 212.69, Position: 45.45

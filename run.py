@@ -5,9 +5,8 @@ from exp.exp_stock_forecast import Exp_Stock_Forecast
 from data_provider.data_loader import StockDataset
 import random
 import numpy as np
-from visualize import visualize_forecast, visualize_loss, visualize_comparison
+from visualize import visualize_forecast, visualize_loss, visualize_comparison, visualize_test_and_predict
 from backtest import backtest  # 導入回測函數
-
 
 def get_user_choice():
     """顯示選項並獲取用戶輸入"""
@@ -25,7 +24,6 @@ def get_user_choice():
                 print("無效選擇，請輸入 1、2 或 3。")
         except ValueError:
             print("請輸入有效的數字！")
-
 
 def run_experiment(args, choice):
     """根據用戶選擇執行實驗"""
@@ -93,6 +91,7 @@ def run_experiment(args, choice):
         visualize_loss(setting=setting)  # 繪製損失曲線圖
         visualize_forecast(setting=setting, feature_idx=3)  # 輸出未來 5 天預測結果
         visualize_comparison(setting=setting, feature_idx=3, historical_data_path=args.data_path)
+        visualize_test_and_predict(setting=setting, feature_idx=3)  # 新增：測試集與預測連接圖
 
     elif choice == 2:  # 僅預測
         print('>>>>>>>預測 : {}<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<'.format(setting))
@@ -101,13 +100,13 @@ def run_experiment(args, choice):
         print('>>>>>>>視覺化 : {}<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<'.format(setting))
         visualize_forecast(setting=setting, feature_idx=3)  # 輸出未來 5 天預測結果
         visualize_comparison(setting=setting, feature_idx=3, historical_data_path=args.data_path)
+        visualize_test_and_predict(setting=setting, feature_idx=3)  # 新增：僅預測時也顯示
 
     # 清理 GPU 記憶體
     if args.gpu_type == 'mps' and hasattr(torch.backends, "mps"):
         torch.backends.mps.empty_cache()
     elif args.gpu_type == 'cuda' and torch.cuda.is_available():
         torch.cuda.empty_cache()
-
 
 if __name__ == '__main__':
     # 固定隨機種子
@@ -116,6 +115,17 @@ if __name__ == '__main__':
     torch.manual_seed(fix_seed)
     np.random.seed(fix_seed)
 
+    # 從 fetch_data.py 引入 fetch_stock_data 函數
+    from fetch_data import fetch_stock_data  # 修改為你的實際檔案名稱
+
+    # 互動提示：讓使用者輸入股票代號
+    ticker = input("請輸入股票代號（例如 AAPL）：").strip().upper() or "AAPL"  # 預設為 AAPL
+    print(f"正在抓取 {ticker} 的股票數據...")
+
+    # 動態抓取數據並保存
+    data_dir = "data/raw"
+    fetch_stock_data(ticker=ticker, period="1y", output_dir=data_dir)
+    data_path = os.path.join(data_dir, f"{ticker.lower()}_daily.csv")
 
     # 設置默認參數（使用類似 argparse 的方式，但不依賴命令行）
     class Args:
@@ -127,7 +137,7 @@ if __name__ == '__main__':
 
         # data loader
         data = 'stock'
-        data_path = 'data/raw/aapl_daily.csv'
+        data_path = data_path  # 動態更新為抓取的數據路徑
         checkpoints = './checkpoints/'
 
         # forecasting task
@@ -165,7 +175,6 @@ if __name__ == '__main__':
         gpu_type = 'cuda'  # cuda or mps
         use_multi_gpu = False
         devices = '0,1,2,3'
-
 
     args = Args()
 

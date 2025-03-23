@@ -130,7 +130,7 @@ class Exp_Stock_Forecast(Exp_Basic):
 
     def test(self, setting, test=0):
         test_data = self._get_data(flag="test")
-        test_loader = torch.utils.data.DataLoader(test_data, batch_size=32, shuffle=False)
+        test_loader = torch.utils.data.DataLoader(test_data, batch_size=32, shuffle=False, drop_last=False)
 
         model = self.model
         checkpoint_path = os.path.join("checkpoints", f"{setting}_best_model.pth")
@@ -139,18 +139,44 @@ class Exp_Stock_Forecast(Exp_Basic):
 
         test_loss = 0
         criterion = nn.MSELoss()
+        all_preds = []
+        all_trues = []
+        all_dates = []
+
         with torch.no_grad():
             for batch in test_loader:
                 x = batch["x"].to(self.device)
                 y = batch["y"].to(self.device)
+                mean = batch["mean"].to(self.device)
+                std = batch["std"].to(self.device)
                 outputs = model(x, None, None, None)
                 loss = criterion(outputs, y)
                 test_loss += loss.item()
 
+                # 調整 mean 和 std 的形狀以匹配 outputs
+                mean = mean.unsqueeze(1).expand_as(outputs)
+                std = std.unsqueeze(1).expand_as(outputs)
+
+                # 反標準化
+                outputs = outputs * std + mean
+                y = y * std + mean
+                all_preds.append(outputs.cpu().numpy())
+                all_trues.append(y.cpu().numpy())
+                all_dates.append(batch["date"])
+
         avg_test_loss = test_loss / len(test_loader)
         print(f"Test Loss: {avg_test_loss:.4f}")
+
+        all_preds = np.concatenate(all_preds, axis=0)
+        all_trues = np.concatenate(all_trues, axis=0)
+        all_dates = np.concatenate(all_dates, axis=0)
+        os.makedirs("results", exist_ok=True)
+        np.save(f"results/{setting}_test_preds.npy", all_preds)
+        np.save(f"results/{setting}_test_trues.npy", all_trues)
+        np.save(f"results/{setting}_test_dates.npy", all_dates, allow_pickle=True)
 
         test_result_path = os.path.join("results", f"{setting}_test_result.txt")
         with open(test_result_path, 'w') as f:
             f.write(f"Test Loss: {avg_test_loss:.4f}\n")
         print(f"Test result saved to {test_result_path}")
+        print(f"Test predictions saved to results/{setting}_test_preds.npy")
