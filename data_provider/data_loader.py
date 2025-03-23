@@ -1,82 +1,47 @@
 import pandas as pd
 import numpy as np
+import torch
 from torch.utils.data import Dataset
 
 
-class Dataset_Custom(Dataset):
-    def __init__(self, root_path, flag='train', size=None, data_path='aapl_daily.csv', scale=True):
-        self.seq_len = size[0]  # 序列長度，例如30
-        self.pred_len = size[1]  # 預測長度，例如5
+class StockDataset(Dataset):
+    def __init__(self, data_path, seq_len=15, pred_len=5, split="train", train_ratio=0.7, valid_ratio=0.2):
+        df = pd.read_csv(data_path)
+        self.data = df["Close"].values.astype(float)
+        self.dates = df["Date"].values
 
-        # 載入數據
-        self.data_path = data_path
-        self.root_path = root_path
-        self.flag = flag
-        self.scale = scale
+        total_len = len(self.data)
+        train_end = int(total_len * train_ratio)
+        valid_end = int(total_len * (train_ratio + valid_ratio))
 
-        # 讀取CSV檔案
-        df_raw = pd.read_csv(f"{root_path}/{data_path}")
-        self.data = df_raw['close'].values
-        self.dates = pd.to_datetime(df_raw['date']).values
-
-        # 數據分割：70%訓練，20%驗證，10%測試
-        num_train = int(len(self.data) * 0.7)
-        num_val = int(len(self.data) * 0.2)
-        num_test = len(self.data) - num_train - num_val
-
-        if flag == 'train':
-            self.start_idx = 0
-            self.end_idx = num_train
-        elif flag == 'val':
-            self.start_idx = num_train
-            self.end_idx = num_train + num_val
+        if split == "train":
+            self.data = self.data[:train_end]
+            self.dates = self.dates[:train_end]
+        elif split == "valid":
+            self.data = self.data[train_end:valid_end]
+            self.dates = self.dates[train_end:valid_end]
         else:  # test
-            self.start_idx = num_train + num_val
-            self.end_idx = len(self.data)
+            self.data = self.data[valid_end:]
+            self.dates = self.dates[valid_end:]
 
-        # 正規化
-        if self.scale:
-            self.scaler = StandardScaler()
-            train_data = self.data[:num_train]
-            self.scaler.fit(train_data.reshape(-1, 1))
-            self.data = self.scaler.transform(self.data.reshape(-1, 1)).flatten()
-
-    def __getitem__(self, index):
-        s_begin = self.start_idx + index
-        s_end = s_begin + self.seq_len
-        r_begin = s_end
-        r_end = r_begin + self.pred_len
-
-        seq_x = self.data[s_begin:s_end]
-        seq_y = self.data[r_begin:r_end]
-
-        return seq_x, seq_y
+        self.seq_len = seq_len
+        self.pred_len = pred_len
+        self.mean = np.mean(self.data)
+        self.std = np.std(self.data)
+        self.data = (self.data - self.mean) / self.std
 
     def __len__(self):
-        return self.end_idx - self.start_idx - self.seq_len - self.pred_len + 1
+        return len(self.data) - self.seq_len - self.pred_len + 1
 
-    def inverse_transform(self, data):
-        if self.scale:
-            return self.scaler.inverse_transform(data.reshape(-1, 1)).flatten()
-        return data
+    def __getitem__(self, idx):
+        x = self.data[idx:idx + self.seq_len]
+        y = self.data[idx + self.seq_len:idx + self.seq_len + self.pred_len]
+        date = self.dates[idx + self.seq_len - 1]
 
-    def get_dates(self, index):
-        s_begin = self.start_idx + index
-        s_end = s_begin + self.seq_len + self.pred_len
-        return self.dates[s_begin:s_end]
-
-
-class StandardScaler:
-    def __init__(self):
-        self.mean = 0.
-        self.std = 1.
-
-    def fit(self, data):
-        self.mean = data.mean()
-        self.std = data.std()
-
-    def transform(self, data):
-        return (data - self.mean) / self.std
-
-    def inverse_transform(self, data):
-        return data * self.std + self.mean
+        return {
+            "x": torch.FloatTensor(x),
+            "y": torch.FloatTensor(y),
+            "date": date,
+            "mean": self.mean,
+            "std": self.std
+        }

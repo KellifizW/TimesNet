@@ -2,23 +2,15 @@ import yfinance as yf
 import pandas as pd
 import os
 
-
-def fetch_stock_data(ticker="AAPL", start_date="2024-03-22", end_date="2025-03-22"):
-    # 創建儲存目錄
-    os.makedirs("data/raw", exist_ok=True)
-
-    # 抓取數據
+def fetch_stock_data(ticker="AAPL", period="1y", output_dir="data/raw"):
+    os.makedirs(output_dir, exist_ok=True)
     stock = yf.Ticker(ticker)
-    data = stock.history(start=start_date, end=end_date, interval="1d")
-
-    # 僅保留日期和收盤價
-    data = data[['Close']].reset_index()
-    data.columns = ['date', 'close']
-
-    # 儲存數據
-    data.to_csv(f"data/raw/{ticker.lower()}_daily.csv", index=False)
-    print(f"Data for {ticker} saved to data/raw/{ticker.lower()}_daily.csv")
-
+    df = stock.history(period=period)
+    df = df[["Open", "High", "Low", "Close", "Volume"]].reset_index()
+    df["Date"] = df["Date"].dt.strftime("%Y-%m-%d")
+    output_path = os.path.join(output_dir, f"{ticker.lower()}_daily.csv")
+    df.to_csv(output_path, index=False)
+    print(f"Data saved to {output_path}")
 
 if __name__ == "__main__":
     fetch_stock_data()
