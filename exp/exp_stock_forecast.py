@@ -13,8 +13,7 @@ class Exp_Stock_Forecast(Exp_Basic):
 
     def _build_model(self):
         model = self.model_dict[self.args.model].Model(self.args).float()
-        if self.args.use_gpu:
-            model = model.cuda()
+        # 移除硬編碼的 model.cuda()，因為 Exp_Basic.__init__ 已將模型移動到 self.device
         return model
 
     def _get_data(self, flag):
@@ -26,14 +25,14 @@ class Exp_Stock_Forecast(Exp_Basic):
         )
         return data_set
 
-    def train(self):
+    def train(self, setting):  # 添加 setting 參數
         train_data = self._get_data(flag="train")
         valid_data = self._get_data(flag="valid")
 
         train_loader = torch.utils.data.DataLoader(train_data, batch_size=32, shuffle=True)
         valid_loader = torch.utils.data.DataLoader(valid_data, batch_size=32, shuffle=False)
 
-        model = self._build_model()
+        model = self.model
         optimizer = torch.optim.Adam(model.parameters(), lr=self.args.learning_rate)
         criterion = nn.MSELoss()
 
@@ -44,8 +43,8 @@ class Exp_Stock_Forecast(Exp_Basic):
             model.train()
             train_loss = 0
             for batch in train_loader:
-                x = batch["x"].unsqueeze(-1).to(self.device)
-                y = batch["y"].unsqueeze(-1).to(self.device)
+                x = batch["x"].to(self.device)  # 形狀為 (batch_size, seq_len, enc_in)，移除 unsqueeze
+                y = batch["y"].to(self.device)  # 形狀為 (batch_size, pred_len, c_out)，移除 unsqueeze
 
                 optimizer.zero_grad()
                 outputs = model(x, None, None, None)
@@ -58,8 +57,8 @@ class Exp_Stock_Forecast(Exp_Basic):
             valid_loss = 0
             with torch.no_grad():
                 for batch in valid_loader:
-                    x = batch["x"].unsqueeze(-1).to(self.device)
-                    y = batch["y"].unsqueeze(-1).to(self.device)
+                    x = batch["x"].to(self.device)  # 形狀為 (batch_size, seq_len, enc_in)
+                    y = batch["y"].to(self.device)  # 形狀為 (batch_size, pred_len, c_out)
                     outputs = model(x, None, None, None)
                     loss = criterion(outputs, y)
                     valid_loss += loss.item()
@@ -73,7 +72,10 @@ class Exp_Stock_Forecast(Exp_Basic):
 
             if avg_valid_loss < best_loss:
                 best_loss = avg_valid_loss
-                torch.save(model.state_dict(), os.path.join("checkpoints", "best_model.pth"))
+                # 使用 setting 參數保存檢查點
+                checkpoint_path = os.path.join("checkpoints", f"{setting}_best_model.pth")
+                torch.save(model.state_dict(), checkpoint_path)
+                print(f"Checkpoint saved to {checkpoint_path}")
 
         # 儲存損失數據
         loss_df = pd.DataFrame({
@@ -82,27 +84,35 @@ class Exp_Stock_Forecast(Exp_Basic):
             "Valid_Loss": self.losses["valid"]
         })
         os.makedirs("results", exist_ok=True)
-        loss_df.to_csv("results/losses.csv", index=False)
+        loss_df.to_csv(os.path.join("results", f"{setting}_losses.csv"), index=False)
 
-    def predict(self):
+    def predict(self, setting=None):
         test_data = self._get_data(flag="test")
         test_loader = torch.utils.data.DataLoader(test_data, batch_size=1, shuffle=False)
 
-        model = self._build_model()
-        model.load_state_dict(torch.load(os.path.join("checkpoints", "best_model.pth")))
+        model = self.model
+        # 使用 setting 參數加載檢查點（假設與 run.py 中的 setting 一致）
+        # 注意：這裡需要確保 checkpoint 文件名與 train 方法中的一致
+        # 由於 predict.py 可能不傳入 setting，這裡使用固定的文件名
+        checkpoint_path = os.path.join("checkpoints", "best_model.pth")
+        model.load_state_dict(torch.load(checkpoint_path))
         model.eval()
 
         preds, trues, dates = [], [], []
         with torch.no_grad():
             for batch in test_loader:
-                x = batch["x"].unsqueeze(-1).to(self.device)
-                y = batch["y"].unsqueeze(-1).to(self.device)
-                mean = batch["mean"].item()
-                std = batch["std"].item()
+                x = batch["x"].to(self.device)  # 形狀為 (batch_size, seq_len, enc_in)
+                y = batch["y"].to(self.device)  # 形狀為 (batch_size, pred_len, c_out)
+                mean = batch["mean"].to(self.device)  # 形狀為 (enc_in,)
+                std = batch["std"].to(self.device)  # 形狀為 (enc_in,)
 
                 outputs = model(x, None, None, None)
-                outputs = outputs.squeeze(-1).cpu().numpy() * std + mean
-                y = y.squeeze(-1).cpu().numpy() * std + mean
+                # 反標準化：outputs 和 y 的形狀為 (batch_size, pred_len, c_out)
+                outputs = outputs * std + mean
+                y = y * std + mean
+
+                outputs = outputs.cpu().numpy()
+                y = y.cpu().numpy()
 
                 preds.append(outputs)
                 trues.append(y)
@@ -116,3 +126,32 @@ class Exp_Stock_Forecast(Exp_Basic):
         np.save("results/preds.npy", preds)
         np.save("results/trues.npy", trues)
         np.save("results/dates.npy", dates)
+
+    # 添加 test 方法以符合 run.py 的調用
+    def test(self, setting, test=0):
+        test_data = self._get_data(flag="test")
+        test_loader = torch.utils.data.DataLoader(test_data, batch_size=32, shuffle=False)
+
+        model = self.model
+        checkpoint_path = os.path.join("checkpoints", f"{setting}_best_model.pth")
+        model.load_state_dict(torch.load(checkpoint_path, weights_only=True))
+        model.eval()
+
+        test_loss = 0
+        criterion = nn.MSELoss()
+        with torch.no_grad():
+            for batch in test_loader:
+                x = batch["x"].to(self.device)  # 形狀為 (batch_size, seq_len, enc_in)
+                y = batch["y"].to(self.device)  # 形狀為 (batch_size, pred_len, c_out)
+                outputs = model(x, None, None, None)
+                loss = criterion(outputs, y)
+                test_loss += loss.item()
+
+        avg_test_loss = test_loss / len(test_loader)
+        print(f"Test Loss: {avg_test_loss:.4f}")
+
+        # 儲存測試結果
+        test_result_path = os.path.join("results", f"{setting}_test_result.txt")
+        with open(test_result_path, 'w') as f:
+            f.write(f"Test Loss: {avg_test_loss:.4f}\n")
+        print(f"Test result saved to {test_result_path}")
