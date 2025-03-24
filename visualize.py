@@ -20,7 +20,7 @@ def visualize_forecast(setting=None, feature_idx=3):
     future_dates, future_prices = load_forecast_data(preds_path, dates_path, feature_idx)
 
     # 打印預測結果
-    print("\nFuture 5 Days Stock Price Forecast (Close Price):")
+    print(f"\nFuture {len(future_dates)} Days Stock Price Forecast (Close Price):")
     for date, price in zip(future_dates, future_prices):
         print(f"{date}: ${price:.2f}")
 
@@ -28,7 +28,7 @@ def visualize_forecast(setting=None, feature_idx=3):
     os.makedirs("results", exist_ok=True)
     forecast_path = os.path.join("results", f"{prefix}future_forecast.txt")
     with open(forecast_path, "w") as f:
-        f.write("Future 5 Days Stock Price Forecast (Close Price):\n")
+        f.write(f"Future {len(future_dates)} Days Stock Price Forecast (Close Price):\n")
         for date, price in zip(future_dates, future_prices):
             f.write(f"{date}: ${price:.2f}\n")
     print(f"Forecast saved to {forecast_path}")

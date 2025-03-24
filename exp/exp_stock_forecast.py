@@ -4,14 +4,45 @@ from exp.exp_basic import Exp_Basic
 import os
 import numpy as np
 import pandas as pd
+from data_utils import generate_trading_days  # 導入 generate_trading_days
 
+# 導入所有模型
+from models import (
+    Autoformer, Crossformer, DLinear, FEDformer, FiLM, Informer, iTransformer,
+    Koopa, LightTS, MambaSimple, MICN, MultiPatchFormer, PatchTST, Reformer,
+    TemporalFusionTransformer, TimeMixer, TimesNet, TimeXer, Transformer
+)
 
 class Exp_Stock_Forecast(Exp_Basic):
     def __init__(self, args):
         super(Exp_Stock_Forecast, self).__init__(args)
         self.losses = {"train": [], "valid": []}
+        # 定義 model_dict，映射模型名稱到對應的模型類
+        self.model_dict = {
+            'Autoformer': Autoformer,
+            'Crossformer': Crossformer,
+            'DLinear': DLinear,
+            'FEDformer': FEDformer,
+            'FiLM': FiLM,
+            'Informer': Informer,
+            'iTransformer': iTransformer,
+            'Koopa': Koopa,
+            'LightTS': LightTS,
+            'MambaSimple': MambaSimple,
+            'MICN': MICN,
+            'MultiPatchformer': MultiPatchFormer,
+            'PatchTST': PatchTST,
+            'Reformer': Reformer,
+            'TemporalFusionTransformer': TemporalFusionTransformer,
+            'TimeMixer': TimeMixer,
+            'TimesNet': TimesNet,
+            'Timexer': TimeXer,
+            'Transformer': Transformer,
+        }
 
     def _build_model(self):
+        if self.args.model not in self.model_dict:
+            raise ValueError(f"Model '{self.args.model}' not found. Available models: {list(self.model_dict.keys())}")
         model = self.model_dict[self.args.model].Model(self.args).float()
         return model
 
@@ -109,12 +140,19 @@ class Exp_Stock_Forecast(Exp_Basic):
 
                     outputs = outputs.cpu().numpy()
                     preds.append(outputs)
-                    dates.append(batch["date"])  # date 是一個列表，例如 ["2025-03-24", ...]
+
+                    # 確保 last_date 是字符串，並移除多餘的括號和逗號
+                    last_date = batch["date"][0]
+                    if isinstance(last_date, (np.ndarray, pd.Index)):
+                        last_date = last_date[0]
+                    last_date = str(last_date).strip("(),")  # 移除括號和逗號
+                    future_dates = generate_trading_days(last_date, self.args.pred_len)
+                    dates.append(future_dates)
 
             if not preds:
                 raise ValueError("No predictions generated. Check data or model.")
             preds = np.concatenate(preds, axis=0)
-            dates = np.array(dates)  # 形狀為 (1, pred_len)，例如 (1, 5)
+            dates = np.array(dates)  # 形狀為 (1, pred_len)
             print(f"Prediction completed: {len(preds)} samples")
 
             os.makedirs("results", exist_ok=True)

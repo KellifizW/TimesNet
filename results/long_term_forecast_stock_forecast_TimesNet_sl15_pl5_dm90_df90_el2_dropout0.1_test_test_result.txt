@@ -1,1 +1,1 @@
-Test Loss: 6.1716
+Test Loss: 3.2190

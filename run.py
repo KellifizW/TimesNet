@@ -25,6 +25,94 @@ def get_user_choice():
         except ValueError:
             print("請輸入有效的數字！")
 
+def get_interactive_args():
+    """交互式獲取用戶輸入的參數"""
+    class Args:
+        # 預設參數
+        task_name = 'long_term_forecast'
+        is_training = 1
+        model_id = 'stock_forecast'
+        model = 'TimesNet'
+        seq_len = 15
+        label_len = 0
+        pred_len = 5
+        top_k = 5
+        num_kernels = 6
+        enc_in = 1  # 將動態設置
+        dec_in = 1  # 將動態設置
+        c_out = 1  # 將動態設置
+        d_model = 90
+        d_ff = 90
+        e_layers = 2
+        dropout = 0.1
+        embed = 'timeF'
+        freq = 'd'
+        num_workers = 0
+        itr = 1
+        train_epochs = 150
+        batch_size = 32
+        patience = 3
+        learning_rate = 0.0001
+        des = 'test'
+        loss = 'MSE'
+        lradj = 'type1'
+        use_gpu = True
+        gpu = 0
+        gpu_type = 'cuda'  # cuda or mps
+        use_multi_gpu = False
+        devices = '0,1,2,3'
+        data = 'stock'
+        checkpoints = './checkpoints/'
+
+    args = Args()
+
+    # 交互式輸入股票代號
+    ticker = input("請輸入股票代號（例如 AAPL，預設 AAPL）：").strip().upper() or "AAPL"
+    print(f"正在抓取 {ticker} 的股票數據...")
+    data_dir = "data/raw"
+    from fetch_data import fetch_stock_data
+    try:
+        # 調用 fetch_stock_data，並獲取生成的數據文件路徑
+        data_path = fetch_stock_data(ticker=ticker, output_dir=data_dir)
+        if data_path is None:
+            raise ValueError("fetch_stock_data 返回了 None，無法獲取數據文件路徑。")
+        args.data_path = data_path
+    except Exception as e:
+        print(f"無法下載股票數據：{str(e)}")
+        print("程式將退出。")
+        exit(1)
+
+    # 定義可用模型列表（與 exp_stock_forecast.py 中的 model_dict 保持一致）
+    available_models = [
+        'Autoformer', 'Crossformer', 'DLinear', 'FEDformer', 'FiLM', 'Informer',
+        'iTransformer', 'Koopa', 'LightTS', 'MambaSimple', 'MICN', 'MultiPatchformer',
+        'PatchTST', 'Reformer', 'TemporalFusionTransformer', 'TimeMixer', 'TimesNet',
+        'Timexer', 'Transformer'
+    ]
+
+    # 交互式輸入關鍵參數
+    print("\n請輸入參數（按 Enter 接受預設值）：")
+    print(f"可用模型: {available_models}")
+    while True:
+        model_input = input(f"模型名稱（預設: {args.model}）：") or args.model
+        if model_input in available_models:
+            args.model = model_input
+            break
+        else:
+            print(f"錯誤：'{model_input}' 不在可用模型中，請重新輸入。")
+
+    args.seq_len = int(input(f"輸入序列長度（預設: {args.seq_len}）：") or args.seq_len)
+    args.pred_len = int(input(f"預測長度（預設: {args.pred_len}）：") or args.pred_len)
+    args.d_model = int(input(f"模型維度（預設: {args.d_model}）：") or args.d_model)
+    args.d_ff = int(input(f"前饋層維度（預設: {args.d_ff}）：") or args.d_ff)
+    args.e_layers = int(input(f"編碼器層數（預設: {args.e_layers}）：") or args.e_layers)
+    args.dropout = float(input(f"Dropout 比例（預設: {args.dropout}）：") or args.dropout)
+    args.learning_rate = float(input(f"學習率（預設: {args.learning_rate}）：") or args.learning_rate)
+    args.train_epochs = int(input(f"訓練週期（預設: {args.train_epochs}）：") or args.train_epochs)
+    args.batch_size = int(input(f"批次大小（預設: {args.batch_size}）：") or args.batch_size)
+
+    return args
+
 def run_experiment(args, choice):
     """根據用戶選擇執行實驗"""
     # 動態設置 enc_in, dec_in, c_out
@@ -115,74 +203,12 @@ if __name__ == '__main__':
     torch.manual_seed(fix_seed)
     np.random.seed(fix_seed)
 
-    # 從 fetch_data.py 引入 fetch_stock_data 函數
-    from fetch_data import fetch_stock_data  # 修改為你的實際檔案名稱
-
-    # 互動提示：讓使用者輸入股票代號
-    ticker = input("請輸入股票代號（例如 AAPL）：").strip().upper() or "AAPL"  # 預設為 AAPL
-    print(f"正在抓取 {ticker} 的股票數據...")
-
-    # 動態抓取數據並保存
-    data_dir = "data/raw"
-    fetch_stock_data(ticker=ticker, period="1y", output_dir=data_dir)
-    data_path = os.path.join(data_dir, f"{ticker.lower()}_daily.csv")
-
-    # 設置默認參數（使用類似 argparse 的方式，但不依賴命令行）
-    class Args:
-        # basic config
-        task_name = 'long_term_forecast'
-        is_training = 1
-        model_id = 'stock_forecast'
-        model = 'TimesNet'
-
-        # data loader
-        data = 'stock'
-        data_path = data_path  # 動態更新為抓取的數據路徑
-        checkpoints = './checkpoints/'
-
-        # forecasting task
-        seq_len = 15
-        label_len = 0
-        pred_len = 5
-
-        # model define
-        top_k = 5
-        num_kernels = 6
-        enc_in = 1  # 將動態設置
-        dec_in = 1  # 將動態設置
-        c_out = 1  # 將動態設置
-        d_model = 90
-        d_ff = 90
-        e_layers = 2
-        dropout = 0.1
-        embed = 'timeF'
-        freq = 'd'
-
-        # optimization
-        num_workers = 0
-        itr = 1
-        train_epochs = 150
-        batch_size = 32
-        patience = 3
-        learning_rate = 0.0001
-        des = 'test'
-        loss = 'MSE'
-        lradj = 'type1'
-
-        # GPU
-        use_gpu = True
-        gpu = 0
-        gpu_type = 'cuda'  # cuda or mps
-        use_multi_gpu = False
-        devices = '0,1,2,3'
-
-    args = Args()
-
     # 主循環：持續詢問用戶選擇
     while True:
         choice = get_user_choice()
         if choice == 3:  # 退出
             print("程序結束。")
             break
+        args = get_interactive_args()  # 獲取交互式參數
         run_experiment(args, choice)
         print("\n執行完成！")
