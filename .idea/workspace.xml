@@ -4,23 +4,15 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="292b40a3-630d-40ab-9746-7415e32f3255" name="Changes" comment="323">
+    <list default="true" id="292b40a3-630d-40ab-9746-7415e32f3255" name="Changes" comment="324">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/checkpoints/long_term_forecast_stock_forecast_TimesNet_sl15_pl5_dm90_df90_el2_dropout0.1_test_best_model.pth" beforeDir="false" afterPath="$PROJECT_DIR$/checkpoints/long_term_forecast_stock_forecast_TimesNet_sl15_pl5_dm90_df90_el2_dropout0.1_test_best_model.pth" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backtest.py" beforeDir="false" afterPath="$PROJECT_DIR$/backtest.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/data/raw/aapl_daily.csv" beforeDir="false" afterPath="$PROJECT_DIR$/data/raw/aapl_daily.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/data_provider/data_factory.py" beforeDir="false" afterPath="$PROJECT_DIR$/data_provider/data_factory.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/data_provider/data_loader.py" beforeDir="false" afterPath="$PROJECT_DIR$/data_provider/data_loader.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/data_utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/data_utils.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/exp/exp_stock_forecast.py" beforeDir="false" afterPath="$PROJECT_DIR$/exp/exp_stock_forecast.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/fetch_data.py" beforeDir="false" afterPath="$PROJECT_DIR$/fetch_data.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/models/ETSformer.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/models/FreTS.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/models/Nonstationary_Transformer.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/models/PAttn.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/models/Pyraformer.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/models/SCINet.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/models/SegRNN.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/models/TSMixer.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/models/TiDE.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/models/WPMixer.py" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/results/long_term_forecast_stock_forecast_TimesNet_sl15_pl5_dm90_df90_el2_dropout0.1_test_backtest_result.txt" beforeDir="false" afterPath="$PROJECT_DIR$/results/long_term_forecast_stock_forecast_TimesNet_sl15_pl5_dm90_df90_el2_dropout0.1_test_backtest_result.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/results/long_term_forecast_stock_forecast_TimesNet_sl15_pl5_dm90_df90_el2_dropout0.1_test_comparison_plot.html" beforeDir="false" afterPath="$PROJECT_DIR$/results/long_term_forecast_stock_forecast_TimesNet_sl15_pl5_dm90_df90_el2_dropout0.1_test_comparison_plot.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/results/long_term_forecast_stock_forecast_TimesNet_sl15_pl5_dm90_df90_el2_dropout0.1_test_dates.npy" beforeDir="false" afterPath="$PROJECT_DIR$/results/long_term_forecast_stock_forecast_TimesNet_sl15_pl5_dm90_df90_el2_dropout0.1_test_dates.npy" afterDir="false" />
@@ -28,9 +20,9 @@
       <change beforePath="$PROJECT_DIR$/results/long_term_forecast_stock_forecast_TimesNet_sl15_pl5_dm90_df90_el2_dropout0.1_test_loss_plot.html" beforeDir="false" afterPath="$PROJECT_DIR$/results/long_term_forecast_stock_forecast_TimesNet_sl15_pl5_dm90_df90_el2_dropout0.1_test_loss_plot.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/results/long_term_forecast_stock_forecast_TimesNet_sl15_pl5_dm90_df90_el2_dropout0.1_test_losses.csv" beforeDir="false" afterPath="$PROJECT_DIR$/results/long_term_forecast_stock_forecast_TimesNet_sl15_pl5_dm90_df90_el2_dropout0.1_test_losses.csv" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/results/long_term_forecast_stock_forecast_TimesNet_sl15_pl5_dm90_df90_el2_dropout0.1_test_preds.npy" beforeDir="false" afterPath="$PROJECT_DIR$/results/long_term_forecast_stock_forecast_TimesNet_sl15_pl5_dm90_df90_el2_dropout0.1_test_preds.npy" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/results/long_term_forecast_stock_forecast_TimesNet_sl15_pl5_dm90_df90_el2_dropout0.1_test_test_result.txt" beforeDir="false" afterPath="$PROJECT_DIR$/results/long_term_forecast_stock_forecast_TimesNet_sl15_pl5_dm90_df90_el2_dropout0.1_test_test_result.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/run.py" beforeDir="false" afterPath="$PROJECT_DIR$/run.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/testGPU1.py" beforeDir="false" afterPath="$PROJECT_DIR$/testGPU1.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/utils/metrics.py" beforeDir="false" afterPath="$PROJECT_DIR$/utils/metrics.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/utils/tools.py" beforeDir="false" afterPath="$PROJECT_DIR$/utils/tools.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/visualize.py" beforeDir="false" afterPath="$PROJECT_DIR$/visualize.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -188,7 +180,9 @@
       <workItem from="1742740962021" duration="18000" />
       <workItem from="1742740988052" duration="9172000" />
       <workItem from="1742809075319" duration="346000" />
-      <workItem from="1742821444735" duration="6457000" />
+      <workItem from="1742821444735" duration="8350000" />
+      <workItem from="1742837518758" duration="1620000" />
+      <workItem from="1742900109828" duration="22065000" />
     </task>
     <task id="LOCAL-00001" summary="1">
       <option name="closed" value="true" />
@@ -286,7 +280,15 @@
       <option name="project" value="LOCAL" />
       <updated>1742750479423</updated>
     </task>
-    <option name="localTasksCounter" value="13" />
+    <task id="LOCAL-00013" summary="324">
+      <option name="closed" value="true" />
+      <created>1742828075577</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1742828075577</updated>
+    </task>
+    <option name="localTasksCounter" value="14" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -306,7 +308,8 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="1" />
     <MESSAGE value="323" />
-    <option name="LAST_COMMIT_MESSAGE" value="323" />
+    <MESSAGE value="324" />
+    <option name="LAST_COMMIT_MESSAGE" value="324" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/run_ipynb$convert.coverage" NAME="convert Coverage Results" MODIFIED="1742742998142" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />

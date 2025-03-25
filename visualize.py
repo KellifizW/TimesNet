@@ -19,12 +19,10 @@ def visualize_forecast(setting=None, feature_idx=3):
 
     future_dates, future_prices = load_forecast_data(preds_path, dates_path, feature_idx)
 
-    # 打印預測結果
     print(f"\nFuture {len(future_dates)} Days Stock Price Forecast (Close Price):")
     for date, price in zip(future_dates, future_prices):
         print(f"{date}: ${price:.2f}")
 
-    # 保存預測結果
     os.makedirs("results", exist_ok=True)
     forecast_path = os.path.join("results", f"{prefix}future_forecast.txt")
     with open(forecast_path, "w") as f:
@@ -44,14 +42,15 @@ def visualize_loss(setting=None):
     df = load_loss_data(loss_csv_path)
 
     fig = go.Figure()
-    fig.add_trace(go.Scatter(x=df["Epoch"], y=df["Train_Loss"], mode="lines", name="Train Loss"))
-    fig.add_trace(go.Scatter(x=df["Epoch"], y=df["Valid_Loss"], mode="lines", name="Valid Loss"))
+    fig.add_trace(go.Scatter(x=df["Epoch"], y=df["Train_Loss"], mode="lines", name="Train Loss", line=dict(color="#87CEEB")))
+    fig.add_trace(go.Scatter(x=df["Epoch"], y=df["Valid_Loss"], mode="lines", name="Valid Loss", line=dict(color="#FFA500")))
 
     fig.update_layout(
         title="Training and Validation Loss",
         xaxis_title="Epoch",
         yaxis_title="Loss (MSE)",
-        template="plotly_dark"
+        template="plotly_white",
+        font=dict(color="black")
     )
 
     plot_path = os.path.join("results", f"{prefix}loss_plot.html")
@@ -71,7 +70,6 @@ def visualize_comparison(setting=None, feature_idx=3, historical_data_path=None)
 
     future_dates, future_prices = load_forecast_data(preds_path, dates_path, feature_idx)
 
-    # 加載歷史數據
     if historical_data_path is None:
         historical_data_path = "data/raw/aapl_daily.csv"
     print(f"Loading historical data from {historical_data_path}")
@@ -81,16 +79,16 @@ def visualize_comparison(setting=None, feature_idx=3, historical_data_path=None)
 
     historical_dates, historical_prices = load_historical_data(historical_data_path)
 
-    # 繪製對比圖
     fig = go.Figure()
-    fig.add_trace(go.Scatter(x=historical_dates, y=historical_prices, mode="lines", name="Historical Close Price", line=dict(color="blue")))
-    fig.add_trace(go.Scatter(x=future_dates, y=future_prices, mode="lines", name="Forecasted Close Price", line=dict(color="red", dash="dash")))
+    fig.add_trace(go.Scatter(x=historical_dates, y=historical_prices, mode="lines", name="Historical Close Price", line=dict(color="#87CEEB")))
+    fig.add_trace(go.Scatter(x=future_dates, y=future_prices, mode="lines", name="Forecasted Close Price", line=dict(color="#FFA500", dash="dash")))
 
     fig.update_layout(
         title="Historical vs Forecasted Stock Prices",
         xaxis_title="Date",
         yaxis_title="Price (USD)",
-        template="plotly_dark"
+        template="plotly_white",
+        font=dict(color="black")
     )
 
     os.makedirs("results", exist_ok=True)
@@ -98,7 +96,7 @@ def visualize_comparison(setting=None, feature_idx=3, historical_data_path=None)
     fig.write_html(comparison_plot_path)
     print(f"Comparison plot saved to {comparison_plot_path}")
 
-def visualize_test_and_predict(setting=None, feature_idx=3):
+def visualize_test_and_predict(setting=None, feature_idx=3, pred_len=10):  # 添加 pred_len 參數
     prefix = f"{setting}_"
     test_preds_path = os.path.join("results", f"{prefix}test_preds.npy")
     test_trues_path = os.path.join("results", f"{prefix}test_trues.npy")
@@ -110,28 +108,32 @@ def visualize_test_and_predict(setting=None, feature_idx=3):
         print(f"Error: Required files missing for {setting}.")
         return
 
+    # 使用 historical_data_path 從 args 或默認值獲取
+    historical_data_path = "data/raw/aapl_daily.csv"  # 假設默認值
     all_dates, all_pred, all_true = load_and_process_test_predict_data(
-        test_preds_path, test_trues_path, test_dates_path, pred_preds_path, pred_dates_path, feature_idx
+        setting=setting,
+        pred_len=pred_len,  # 正確傳入 pred_len
+        historical_data_path=historical_data_path,
+        feature_idx=feature_idx
     )
 
-    # 繪製圖表
     fig = go.Figure()
-    fig.add_trace(go.Scatter(x=all_dates, y=all_true, mode='lines+markers', name='True Close Price', line=dict(color='blue')))
-    fig.add_trace(go.Scatter(x=all_dates, y=all_pred, mode='lines+markers', name='Predicted Close Price', line=dict(color='red', dash='dash')))
+    fig.add_trace(go.Scatter(x=all_dates, y=all_true, mode='lines', name='True Close Price', line=dict(color='#87CEEB')))
+    fig.add_trace(go.Scatter(x=all_dates, y=all_pred, mode='lines', name='Predicted Close Price', line=dict(color='#FFA500', dash='dash')))
 
     fig.update_layout(
         title="Test Set and Future Prediction: Close Price",
         xaxis_title="Date",
         yaxis_title="Close Price (USD)",
         legend_title="Legend",
-        template="plotly_dark"
+        template="plotly_white",
+        font=dict(color="black")
     )
 
     os.makedirs("results", exist_ok=True)
     fig.write_html(f"results/{prefix}test_and_predict_comparison.html")
     print(f"Test and predict comparison plot saved to results/{prefix}test_and_predict_comparison.html")
 
-    # 打印每日股價
     print("\nTest Set and Future Daily Close Price Forecast:")
     for date, pred, true in zip(all_dates, all_pred, all_true):
         true_str = f"${true:.2f}" if not np.isnan(true) else "N/A"

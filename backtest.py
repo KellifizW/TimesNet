@@ -4,22 +4,42 @@ import torch
 import os
 from datetime import datetime, timedelta
 
+
 def backtest(setting, model, data_loader, device, seq_len, pred_len, feature_idx=3):
     try:
         model.eval()
         preds, trues, dates = [], [], []
 
+        # 從 data_loader.dataset 獲取全局 mean, std 和 dates
+        dataset = data_loader.dataset
+        mean = torch.FloatTensor(dataset.get_mean()).to(device)  # 全局均值
+        std = torch.FloatTensor(dataset.get_std()).to(device)  # 全局標準差
+        all_dates = dataset.get_dates()  # 所有日期
+
         # 滾動預測
         with torch.no_grad():
             for i, batch in enumerate(data_loader):
-                x = batch["x"].to(device)
-                y = batch["y"].to(device)
-                mean = batch["mean"].to(device)
-                std = batch["std"].to(device)
+                # 解包元組
+                x, y, x_mark, y_mark = batch
 
-                outputs = model(x, None, None, None)
-                outputs = outputs * std + mean
-                y = y * std + mean
+                # 將數據移動到設備上
+                x = x.to(device)
+                y = y.to(device)
+                x_mark = x_mark.to(device)
+                y_mark = y_mark.to(device)
+
+                # 創建解碼器輸入（與 exp_stock_forecast.py 一致）
+                dec_inp = torch.zeros_like(y[:, -pred_len:, :]).float()
+                dec_inp = torch.cat([y[:, :seq_len - pred_len, :], dec_inp], dim=1).float().to(device)
+
+                # 模型預測
+                outputs = model(x, x_mark, dec_inp, y_mark)
+                outputs = outputs[:, -pred_len:, :]  # 只取預測部分
+                y = y[:, -pred_len:, :]  # 只取目標部分
+
+                # 反標準化（僅針對指定特徵）
+                outputs = outputs * std[feature_idx] + mean[feature_idx]
+                y = y * std[feature_idx] + mean[feature_idx]
 
                 outputs = outputs.cpu().numpy()
                 y = y.cpu().numpy()
@@ -27,8 +47,9 @@ def backtest(setting, model, data_loader, device, seq_len, pred_len, feature_idx
                 preds.append(outputs)
                 trues.append(y)
 
-                # 處理 date 欄位（單個字符串）
-                start_date = pd.to_datetime(batch["date"][0])  # batch["date"] 是一個列表，例如 ["2025-03-07", ...]
+                # 處理日期（從 all_dates 中提取）
+                start_idx = i * data_loader.batch_size
+                start_date = pd.to_datetime(all_dates[start_idx])
                 batch_dates = [(start_date + timedelta(days=j)).strftime("%Y-%m-%d") for j in range(pred_len)]
                 dates.append(batch_dates)
 
@@ -50,8 +71,8 @@ def backtest(setting, model, data_loader, device, seq_len, pred_len, feature_idx
         # 計算方向準確率
         direction_correct = 0
         for i in range(1, len(preds_flat)):
-            pred_change = preds_flat[i] - trues_flat[i-1]
-            true_change = trues_flat[i] - trues_flat[i-1]
+            pred_change = preds_flat[i] - trues_flat[i - 1]
+            true_change = trues_flat[i] - trues_flat[i - 1]
             if (pred_change > 0 and true_change > 0) or (pred_change < 0 and true_change < 0):
                 direction_correct += 1
         direction_accuracy = direction_correct / (len(preds_flat) - 1) * 100
@@ -65,7 +86,7 @@ def backtest(setting, model, data_loader, device, seq_len, pred_len, feature_idx
         for i in range(1, len(preds_flat)):
             pred_price = preds_flat[i]
             true_price = trues_flat[i]
-            prev_price = trues_flat[i-1]
+            prev_price = trues_flat[i - 1]
 
             if position > 0 and (prev_price - true_price) / prev_price > stop_loss:
                 capital = position * true_price

@@ -2,16 +2,16 @@ import yfinance as yf
 import pandas as pd
 import os
 
-def fetch_stock_data(ticker="AAPL", period="7y", output_dir="data/raw"):
+def fetch_stock_data(ticker="AAPL", years=5, output_dir="data/raw"):
     try:
         # 創建輸出目錄
         os.makedirs(output_dir, exist_ok=True)
         output_path = os.path.join(output_dir, f"{ticker.lower()}_daily.csv")
 
         # 下載股票數據
-        print(f"正在下載 {ticker} 的股票數據（{period}）...")
+        print(f"正在下載 {ticker} 的股票數據（{years} 年）...")
         stock = yf.Ticker(ticker)
-        df = stock.history(period=period)
+        df = stock.history(period=f"{years}y")
 
         # 檢查數據是否為空
         if df.empty:
@@ -35,7 +35,11 @@ def fetch_stock_data(ticker="AAPL", period="7y", output_dir="data/raw"):
 
 if __name__ == "__main__":
     try:
-        fetch_stock_data()
+        years = int(input("請輸入下載數據的年份（預設: 5）：") or 5)
+        fetch_stock_data(years=years)
+    except ValueError:
+        print("請輸入有效的數字！")
+        exit(1)
     except Exception as e:
         print(f"執行 fetch_stock_data 時發生錯誤：{str(e)}")
         exit(1)
